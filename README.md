@@ -102,10 +102,6 @@ crates/
   binance-*/      Binance exchange connectors
   types/          Core data types (Decimal, Account, Venue, etc.)
   config/         Configuration parsing
-  user/           Multi-tenant user management
-  gateway/        API gateway with auth
-  git_store/      Git-based strategy versioning
-
 strategies/       Example strategy components
 transformers/     Example transformer components
 evm_multicalls/   Example multicall components
@@ -134,9 +130,6 @@ wasmtime compile target/wasm32-wasip1/debug/my_strategy.wasm
 Rengine includes components for running as a multi-user platform:
 
 - **WASM Build Service** - HTTP service that compiles user-submitted Rust code to WASM with a dependency whitelist
-- **Git Store** - Per-user versioned code repositories with rollback support
-- **User & Auth** - JWT + API key authentication with subscription tiers and quota tracking
-- **Gateway** - Authenticated API that orchestrates builds, storage, and quota enforcement
 
 ## Why It's Good
 
@@ -151,4 +144,4 @@ Rengine includes components for running as a multi-user platform:
 
 ## License
 
-Proprietary
+MIT
