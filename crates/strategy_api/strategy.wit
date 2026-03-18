@@ -1,0 +1,18 @@
+package strategy:strategy;
+
+world strategy {
+  import indicator: func(key: string) -> result<list<u8>, string>;
+  import balance: func(key: string) -> result<list<u8>, string>;
+  import book: func(key: string) -> result<list<u8>, string>;
+  import open-orders: func(key: string) -> result<list<u8>, string>;
+  import perp-positions: func(key: string) -> result<list<u8>, string>;
+  import spot-exposure: func(key: string) -> result<list<u8>, string>;
+  import trade-flow: func() -> result<list<u8>, string>;
+  import market-spec: func(key: string) -> result<list<u8>, string>;
+  import trace: func(value: string);
+  import record-latency: func(key: string, value: u64);
+
+  export init: func() -> list<u8>;
+  export exec: func(state: list<u8>) -> result<tuple<list<u8>, list<u8>>, string>;
+}
+

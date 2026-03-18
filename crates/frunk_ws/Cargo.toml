@@ -1,0 +1,32 @@
+[package]
+name = "frunk_ws"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "frunk_ws"
+path = "src/lib.rs"
+
+[[example]]
+name = "simple_bot"
+path = "examples/simple_example.rs"
+
+[[example]]
+name = "hyperliquid_example"
+path = "examples/hyperliquid_example.rs"
+
+[dependencies]
+anyhow.workspace = true
+chrono.workspace = true
+futures.workspace = true
+futures-util.workspace = true
+frunk.workspace = true
+tokio.workspace = true
+tokio-tungstenite.workspace = true
+tokio-stream.workspace = true
+serde_json.workspace = true
+serde.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tracing-subscriber.workspace = true

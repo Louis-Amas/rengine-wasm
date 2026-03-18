@@ -1,0 +1,6 @@
+package evm-logs:evm-logs;
+
+world evm-logs {
+  export init: func() -> tuple<list<u8>, list<u8>>;
+  export handle-log-message: func(state: list<u8>, log: list<u8>) -> tuple<list<u8>, list<u8>>;
+}

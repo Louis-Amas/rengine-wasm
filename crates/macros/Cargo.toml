@@ -1,0 +1,19 @@
+[package]
+name = "rengine-macros"
+description = "macros"
+
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+
+[lib]
+proc-macro = true
+
+[lints]
+workspace = true
+
+[dependencies]
+quote.workspace = true
+syn.workspace = true
+proc-macro2.workspace = true

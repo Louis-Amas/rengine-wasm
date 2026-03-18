@@ -1,0 +1,21 @@
+[package]
+name = "evm-types"
+description = "types"
+
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+alloy = { workspace = true, default-features = false, features = ["sol-types", "json"] }
+borsh.workspace = true
+serde.workspace = true
+rengine-types.workspace = true
+rust_decimal.workspace = true
+
+[features]
+providers = ["alloy/providers", "alloy/contract"]

@@ -1,0 +1,20 @@
+[package]
+name = "evm-strategy-integration-test"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[package.metadata.component]
+package = "strategy:strategy"
+
+[package.metadata.component.dependencies]
+
+[dependencies]
+anyhow.workspace = true
+strategy-api.workspace = true
+rengine-types.workspace = true
+alloy = { workspace = true, features = ["sol-types"] }
+evm-types = { workspace = true, features = ["providers"] }
+borsh = { workspace = true, features = ["derive"] }

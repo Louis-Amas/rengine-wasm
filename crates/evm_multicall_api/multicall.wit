@@ -1,0 +1,18 @@
+package multicall:multicall;
+
+world multicall {
+  import indicator: func(key: string) -> result<list<u8>, string>;
+  import balance: func(key: string) -> result<list<u8>, string>;
+  import book: func(key: string) -> result<list<u8>, string>;
+  import open-orders: func(key: string) -> result<list<u8>, string>;
+  import perp-positions: func(key: string) -> result<list<u8>, string>;
+  import spot-exposure: func(key: string) -> result<list<u8>, string>;
+  import trace: func(value: string);
+
+  export init: func() -> list<u8>;
+  export config: func() -> list<u8>;
+  export requests: func() -> list<u8>;
+  export handle: func(state: list<u8>, value: list<u8>) -> result<tuple<list<u8>, list<u8>>, string>;
+}
+
+

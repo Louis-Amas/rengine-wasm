@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rengine UI</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin-top: 0;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            ring: 2px solid var(--accent);
+        }
+
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button.danger {
+            background-color: var(--danger);
+            width: auto;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .long {
+            color: var(--success);
+            background-color: rgba(34, 197, 94, 0.1);
+        }
+
+        .short {
+            color: var(--danger);
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        pre {
+            background-color: var(--bg-color);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Positions -->
+            <div class="card">
+                <div class="section-title">
+                    Open Positions (Perp)
+                    <span id="last-updated"
+                        style="font-size: 0.75rem; color: var(--text-secondary); font-weight: normal;"></span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="positions-table">
+                        <thead>
+                            <tr>
+                                <th>Venue</th>
+                                <th>Account</th>
+                                <th>Symbol</th>
+                                <th>Size</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="4" style="text-align: center;">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Open Orders -->
+            <div class="card">
+                <div class="section-title">Open Orders (CEX)</div>
+                <div style="overflow-x: auto;">
+                    <table id="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Venue</th>
+                                <th>Account</th>
+                                <th>Symbol</th>
+                                <th>Side</th>
+                                <th>Price</th>
+                                <th>Size</th>
+                                <th>Order Type</th>
+                                <th>TIF</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="9" style="text-align: center;">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Balances -->
+            <div class="card">
+                <div class="section-title">Balances</div>
+                <div style="overflow-x: auto;">
+                    <table id="balances-table">
+                        <thead>
+                            <tr>
+                                <th>Account</th>
+                                <th>Symbol</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="3" style="text-align: center;">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Top Book -->
+            <div class="card">
+                <div class="section-title">Top Book</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="text-align: center; flex: 1; cursor: pointer;" onclick="fillPrice('bid')">
+                        <div style="color: var(--text-secondary); font-size: 0.75rem;">Bid</div>
+                        <div id="top-bid-price" class="long" style="font-size: 1.25rem; font-weight: bold;">-</div>
+                        <div id="top-bid-size" style="font-size: 0.875rem; color: var(--text-secondary);">-</div>
+                    </div>
+                    <div style="text-align: center; flex: 1; cursor: pointer;" onclick="fillPrice('ask')">
+                        <div style="color: var(--text-secondary); font-size: 0.75rem;">Ask</div>
+                        <div id="top-ask-price" class="short" style="font-size: 1.25rem; font-weight: bold;">-</div>
+                        <div id="top-ask-size" style="font-size: 0.875rem; color: var(--text-secondary);">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trading Form -->
+            <div class="card">
+                <div class="section-title">Place Order</div>
+                <form id="order-form">
+                    <div class="form-group">
+                        <label>Account</label>
+                        <select id="account-select" required>
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Symbol</label>
+                        <select id="symbol-select" required>
+                            <option value="">Select Account First</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Side</label>
+                        <select id="side">
+                            <option value="Bid">Buy</option>
+                            <option value="Ask">Sell</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Order Type</label>
+                        <select id="order-type">
+                            <option value="Limit">Limit</option>
+                            <option value="Market">Market</option>
+                            <option value="Pegged">Pegged</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input type="number" id="price" step="0.00000001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Size</label>
+                        <input type="number" id="size" step="0.00000001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Time In Force</label>
+                        <select id="tif">
+                            <option value="GoodUntilCancelled">GTC</option>
+                            <option value="PostOnly">Post Only</option>
+                            <option value="ImmediateOrCancel">IOC</option>
+                            <option value="ReduceOnly">Reduce Only</option>
+                        </select>
+                    </div>
+                    <button type="submit">Place Order</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Raw State Debug -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <div class="section-title">Raw State (Debug)</div>
+            <pre id="raw-state" style="max-height: 80vh; overflow-y: auto; font-size: 1rem;">Loading...</pre>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = ''; // Relative path
+        let lastState = {};
+
+        // State for dropdowns
+        let availableAccounts = new Set();
+        let availableMarkets = {}; // venue -> [symbol]
+
+        async function fetchState() {
+            try {
+                const response = await fetch(`${API_URL}/state`);
+                const state = await response.json();
+                lastState = state;
+                updateUI(state);
+                updateDropdowns(state);
+                renderTopBook();
+            } catch (error) {
+                console.error('Error fetching state:', error);
+            }
+        }
+
+        function parseKey(keyStr) {
+            const parts = keyStr.split('|');
+            if (parts.length >= 4) {
+                return {
+                    venue: parts[0],
+                    marketType: parts[1],
+                    accountId: parts[2],
+                    symbol: parts[3], // or instrument
+                    fullAccount: `${parts[0]}|${parts[1]}|${parts[2]}`
+                };
+            }
+            // Fallback for unexpected formats
+            return {
+                venue: parts[0] || keyStr,
+                marketType: '-',
+                accountId: parts[1] || '-',
+                symbol: parts[2] || '-',
+                fullAccount: keyStr
+            };
+        }
+
+        function updateDropdowns(state) {
+            const accountSelect = document.getElementById('account-select');
+            const symbolSelect = document.getElementById('symbol-select');
+            const currentAccount = accountSelect.value;
+            const currentSymbol = symbolSelect.value;
+
+            // Collect Accounts from Balances, Positions, and Open Orders
+            const newAccounts = new Set();
+
+            if (state.balances) {
+                Object.keys(state.balances).forEach(k => {
+                    const p = parseKey(k);
+                    if (p.fullAccount) newAccounts.add(p.fullAccount);
+                });
+            }
+            if (state.positions) {
+                Object.keys(state.positions).forEach(k => {
+                    const p = parseKey(k);
+                    if (p.fullAccount) newAccounts.add(p.fullAccount);
+                });
+            }
+            if (state.open_orders) {
+                Object.keys(state.open_orders).forEach(k => {
+                    const p = parseKey(k);
+                    if (p.fullAccount) newAccounts.add(p.fullAccount);
+                });
+            }
+
+            // Update Account Dropdown if changed
+            if (newAccounts.size > 0 && (availableAccounts.size !== newAccounts.size || ![...newAccounts].every(a => availableAccounts.has(a)))) {
+                availableAccounts = newAccounts;
+                accountSelect.innerHTML = '<option value="">Select Account</option>';
+                availableAccounts.forEach(acc => {
+                    const option = document.createElement('option');
+                    option.value = acc;
+                    option.textContent = acc;
+                    accountSelect.appendChild(option);
+                });
+                if (currentAccount && availableAccounts.has(currentAccount)) {
+                    accountSelect.value = currentAccount;
+                }
+            }
+
+            // Collect Markets from Book
+            const newMarkets = {};
+
+            if (state.book) {
+                Object.keys(state.book).forEach(k => {
+                    const parts = k.split('|');
+                    if (parts.length >= 2) {
+                        const venue = parts[0];
+                        const instrument = parts.slice(1).join('|');
+
+                        if (!newMarkets[venue]) newMarkets[venue] = [];
+                        if (!newMarkets[venue].includes(instrument)) {
+                            newMarkets[venue].push(instrument);
+                        }
+                    }
+                });
+            }
+
+            availableMarkets = newMarkets;
+
+            // Update Symbol Dropdown based on selected account
+            updateSymbolDropdown();
+        }
+
+        function updateSymbolDropdown() {
+            const accountSelect = document.getElementById('account-select');
+            const symbolSelect = document.getElementById('symbol-select');
+            const currentSymbol = symbolSelect.value;
+
+            const selectedAccount = accountSelect.value;
+            symbolSelect.innerHTML = '<option value="">Select Symbol</option>';
+
+            if (selectedAccount) {
+                const parts = selectedAccount.split('|');
+                const venue = parts[0];
+                const marketType = parts[1];
+
+                let markets = availableMarkets[venue];
+                if (!markets && marketType) {
+                    markets = availableMarkets[`${venue}_${marketType}`] || availableMarkets[`${venue}-${marketType}`];
+                }
+
+                if (markets) {
+                    markets.sort().forEach(sym => {
+                        const option = document.createElement('option');
+                        option.value = sym;
+                        option.textContent = sym;
+                        symbolSelect.appendChild(option);
+                    });
+                }
+            }
+            if (currentSymbol) {
+                // Try to keep selected symbol if it exists in the new list
+                for (let i = 0; i < symbolSelect.options.length; i++) {
+                    if (symbolSelect.options[i].value === currentSymbol) {
+                        symbolSelect.value = currentSymbol;
+                        break;
+                    }
+                }
+            }
+            renderTopBook();
+        }
+
+        function renderTopBook() {
+            const accountStr = document.getElementById('account-select').value;
+            const symbol = document.getElementById('symbol-select').value;
+
+            const bidPriceEl = document.getElementById('top-bid-price');
+            const bidSizeEl = document.getElementById('top-bid-size');
+            const askPriceEl = document.getElementById('top-ask-price');
+            const askSizeEl = document.getElementById('top-ask-size');
+
+            if (!bidPriceEl) return;
+
+            // Reset
+            bidPriceEl.textContent = '-';
+            bidSizeEl.textContent = '-';
+            askPriceEl.textContent = '-';
+            askSizeEl.textContent = '-';
+
+            if (!accountStr || !symbol || !lastState || !lastState.book) return;
+
+            const parts = accountStr.split('|');
+            const venue = parts[0];
+            const key = `${venue}|${symbol}`;
+
+            const book = lastState.book[key];
+            if (book) {
+                if (book.top_bid) {
+                    bidPriceEl.textContent = book.top_bid.price;
+                    bidSizeEl.textContent = book.top_bid.size;
+                }
+                if (book.top_ask) {
+                    askPriceEl.textContent = book.top_ask.price;
+                    askSizeEl.textContent = book.top_ask.size;
+                }
+            }
+        }
+
+        function fillPrice(side) {
+            const priceEl = document.getElementById(side === 'bid' ? 'top-bid-price' : 'top-ask-price');
+            const price = priceEl.textContent;
+            if (price && price !== '-') {
+                document.getElementById('price').value = price;
+            }
+        }
+
+        document.getElementById('account-select').addEventListener('change', updateSymbolDropdown);
+        document.getElementById('symbol-select').addEventListener('change', renderTopBook);
+
+        function updateUI(state) {
+            document.getElementById('last-updated').textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+            document.getElementById('raw-state').textContent = JSON.stringify(state, null, 2);
+
+            // Update Positions
+            const positionsBody = document.querySelector('#positions-table tbody');
+            positionsBody.innerHTML = '';
+
+            if (state.positions) {
+                Object.entries(state.positions).forEach(([keyStr, size]) => {
+                    const p = parseKey(keyStr);
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${p.venue}</td>
+                        <td>${p.accountId}</td>
+                        <td>${p.symbol}</td>
+                        <td class="${parseFloat(size) >= 0 ? 'long' : 'short'}">${size}</td>
+                    `;
+                    positionsBody.appendChild(row);
+                });
+            }
+
+            if (!positionsBody.children.length) {
+                positionsBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-secondary);">No open positions</td></tr>';
+            }
+
+            // Update Open Orders
+            const ordersBody = document.querySelector('#orders-table tbody');
+            ordersBody.innerHTML = '';
+
+            if (state.open_orders) {
+                Object.entries(state.open_orders).forEach(([bookKeyStr, ordersMap]) => {
+                    const p = parseKey(bookKeyStr);
+
+                    Object.entries(ordersMap).forEach(([orderId, info]) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${p.venue}</td>
+                            <td>${p.accountId}</td>
+                            <td>${p.symbol}</td>
+                            <td class="${info.side === 'Bid' ? 'long' : 'short'}">${info.side}</td>
+                            <td>${info.price}</td>
+                            <td>${info.size}</td>
+                            <td>${info.order_type || 'Limit'}</td>
+                            <td>${info.tif}</td>
+                            <td>
+                                <button class="danger" onclick="cancelOrder('${p.venue}', '${p.marketType}', '${p.accountId}', '${p.symbol}', '${orderId}', '${info.order_type || 'Limit'}')">Cancel</button>
+                            </td>
+                        `;
+                        ordersBody.appendChild(row);
+                    });
+                });
+            }
+
+            if (!ordersBody.children.length) {
+                ordersBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-secondary);">No open orders</td></tr>';
+            }
+
+            // Update Balances
+            const balancesBody = document.querySelector('#balances-table tbody');
+            balancesBody.innerHTML = '';
+
+            if (state.balances) {
+                const groupedBalances = {};
+                Object.entries(state.balances).forEach(([keyStr, balance]) => {
+                    if (parseFloat(balance) === 0) return;
+                    const p = parseKey(keyStr);
+                    if (!groupedBalances[p.fullAccount]) {
+                        groupedBalances[p.fullAccount] = [];
+                    }
+                    groupedBalances[p.fullAccount].push({ symbol: p.symbol, balance });
+                });
+
+                Object.keys(groupedBalances).sort().forEach(account => {
+                    groupedBalances[account].sort((a, b) => a.symbol.localeCompare(b.symbol));
+                    groupedBalances[account].forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${account}</td>
+                            <td>${item.symbol}</td>
+                            <td>${item.balance}</td>
+                        `;
+                        balancesBody.appendChild(row);
+                    });
+                });
+            }
+            if (!balancesBody.children.length) {
+                balancesBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--text-secondary);">No balances found</td></tr>';
+            }
+        }
+
+        async function placeOrder(e) {
+            e.preventDefault();
+            const accountStr = document.getElementById('account-select').value;
+            const symbol = document.getElementById('symbol-select').value;
+            const side = document.getElementById('side').value;
+            const orderType = document.getElementById('order-type').value;
+            const price = parseFloat(document.getElementById('price').value);
+            const size = parseFloat(document.getElementById('size').value);
+            const tif = document.getElementById('tif').value;
+
+            if (!accountStr || !symbol) {
+                alert('Please select an account and symbol');
+                return;
+            }
+
+            const payload = {
+                BulkPost: [
+                    accountStr,
+                    [
+                        [
+                            symbol,
+                            {
+                                side: side,
+                                price: price.toString(),
+                                size: size.toString(),
+                                tif: tif,
+                                order_type: orderType,
+                                client_order_id: null
+                            }
+                        ]
+                    ],
+                    "Unmanaged"
+                ]
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert('Order placed successfully!');
+                    fetchState();
+                } else {
+                    const err = await response.json();
+                    alert('Error placing order: ' + JSON.stringify(err));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to place order');
+            }
+        }
+
+        async function cancelOrder(venue, marketType, accountId, symbol, orderId, orderType) {
+            if (!confirm('Are you sure you want to cancel this order?')) return;
+
+            const accountStr = `${venue}|${marketType}|${accountId}`;
+
+            const payload = {
+                BulkCancel: [
+                    accountStr,
+                    [
+                        [
+                            symbol,
+                            { ExternalOrderId: orderId }
+                        ]
+                    ],
+                    "Unmanaged"
+                ]
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/orders`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert('Order cancelled successfully!');
+                    fetchState();
+                } else {
+                    const err = await response.json();
+                    alert('Error cancelling order: ' + JSON.stringify(err));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to cancel order');
+            }
+        }
+
+        document.getElementById('order-form').addEventListener('submit', placeOrder);
+
+        // Poll every 10 seconds
+        fetchState();
+        setInterval(fetchState, 10000);
+    </script>
+</body>
+
+</html>

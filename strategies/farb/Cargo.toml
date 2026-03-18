@@ -1,0 +1,21 @@
+[package]
+name = "farb"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[package.metadata.component]
+package = "strategy:strategy"
+
+[package.metadata.component.dependencies]
+
+[dependencies]
+rengine-types.workspace = true
+strategy-api.workspace = true
+
+anyhow.workspace = true
+borsh.workspace = true
+rust_decimal.workspace = true
+rust_decimal_macros.workspace = true

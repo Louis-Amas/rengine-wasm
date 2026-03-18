@@ -1,0 +1,50 @@
+[package]
+name = "evm"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rengine-macros.workspace = true
+rengine-types.workspace = true
+rengine-utils.workspace = true
+evm-types = { workspace = true, features = ["providers"] }
+evm-logs-api.workspace = true
+wasm-runtime.workspace = true
+rengine-non-wasm-types.workspace = true
+rengine-config.workspace = true
+rengine-interfaces.workspace = true
+rengine-metrics.workspace = true
+
+anyhow.workspace = true
+alloy = { workspace = true, features = [
+  "rpc",
+  "rpc-types-json",
+  "rpc-client",
+  "signers",
+  "signer-local",
+  "providers",
+  "reqwest",
+] }
+chrono.workspace = true
+tokio-tungstenite.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+frunk_ws.workspace = true
+frunk.workspace = true
+futures.workspace = true
+tokio-stream.workspace = true
+borsh.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true
+alloy = { workspace = true, features = [
+  "node-bindings",
+  "rpc-types-trace",
+  "json-rpc",
+  "rpc-client",
+  "signers",
+  "signer-local",
+  "network",
+] }

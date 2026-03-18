@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:  # Allows manual triggering from GitHub UI
+
+# jobs:
+#   test:
+#     runs-on: self-hosted
+#     env:
+#       CARGO_TERM_COLOR: always
+#
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
+#
+#       - uses: Swatinem/rust-cache@v2
+#         with:
+#           cache-on-failure: "true"
+#
+#       - name: Code Linter Validation
+#         run: |
+#           export PATH="$GITHUB_WORKSPACE/.cargo/bin:$PATH"
+#           echo "::group::Running cargo clippy"
+#           cargo clippy --workspace --tests -- -D warnings
+#           cargo +nightly fmt --all --check
+#           echo "::endgroup::"
+#
+#       - name: Run fast unit tests
+#         run: |
+#           export PATH="$GITHUB_WORKSPACE/.cargo/bin:$PATH"
+#           RUSTFLAGS="-L /usr/local/lib" cargo test --workspace --all-features -- --nocapture

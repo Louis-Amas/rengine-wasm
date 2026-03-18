@@ -1,0 +1,23 @@
+[package]
+name = "evm_integration_test"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[package.metadata.component]
+package = "multicall:multicall"
+
+[package.metadata.component.dependencies]
+
+[dependencies]
+rengine-types.workspace = true
+evm-multicall-api.workspace = true
+evm-types.workspace = true
+
+anyhow.workspace = true
+alloy = { workspace = true, features = ["sol-types"] }
+borsh = { workspace = true }
+rust_decimal.workspace = true
+rust_decimal_macros.workspace = true

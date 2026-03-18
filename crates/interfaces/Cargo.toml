@@ -1,0 +1,25 @@
+[package]
+name = "rengine-interfaces"
+description = "interfaces"
+
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+
+[features]
+test_utils = ["dep:toml"]
+
+[lints]
+workspace = true
+
+[dependencies]
+rengine-types.workspace = true
+rengine-non-wasm-types.workspace = true
+
+anyhow.workspace = true
+async-trait.workspace = true
+futures.workspace = true
+mockall.workspace = true
+toml = { workspace = true, optional = true }
+tracing.workspace = true

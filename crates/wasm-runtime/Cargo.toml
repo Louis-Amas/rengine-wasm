@@ -1,0 +1,27 @@
+[package]
+name = "wasm-runtime"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rengine-types.workspace = true
+rengine-metrics.workspace = true
+evm-types = { workspace = true, features = ["providers"] }
+
+anyhow.workspace = true
+alloy.workspace = true
+borsh.workspace = true
+parking_lot.workspace = true
+smol_str.workspace = true
+tokio.workspace = true
+wasmtime = { version = "39.0.1", features = [
+  "component-model",
+  "cranelift",
+  "std",
+  "runtime",
+] }
+wasmtime-wasi = "39.0.1"
+
+[dev-dependencies]
+rust_decimal.workspace = true
+rust_decimal_macros.workspace = true

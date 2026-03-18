@@ -1,0 +1,30 @@
+services:
+  trader:
+    image: rengine:latest
+    volumes:
+      - ./config:/config:ro
+      - ./db:/db
+    environment:
+      - RUST_LOG=info
+    restart: unless-stopped
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.8-alpine
+    container_name: rengine-clickhouse
+    ports:
+      - "8123:8123"   # HTTP interface
+      - "9000:9000"   # Native TCP protocol
+    volumes:
+      - ${PWD}/deploy/docker/initdb.clickhouse:/docker-entrypoint-initdb.d
+      - clickhouse_data:/var/lib/clickhouse
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    environment:
+      - CLICKHOUSE_DB=rengine
+      - CLICKHOUSE_USER=user
+      - CLICKHOUSE_PASSWORD=password
+
+volumes:
+  clickhouse_data:

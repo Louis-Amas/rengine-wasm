@@ -1,0 +1,17 @@
+[package]
+name = "evm-multicall-api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rengine-types.workspace = true
+rengine-macros.workspace = true
+evm-types = { workspace = true, features = ["providers"] }
+
+anyhow.workspace = true
+alloy.workspace = true
+borsh.workspace = true
+parking_lot.workspace = true
+rust_decimal.workspace = true
+rust_decimal_macros.workspace = true
+wit-bindgen.workspace = true

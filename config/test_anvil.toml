@@ -1,0 +1,30 @@
+[db]
+duckDbPath = ":memory:"
+
+[db.clickhouse]
+url = "http://clickhouse:8123"
+user = "user"
+password = "password"
+db_name = "rengine"
+flush_interval = "1s"
+metrics_interval = "1s"
+
+[evm_executors."anvil|default"]
+private_key = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+
+[evm_readers.anvil]
+ws_url = "ws://127.0.0.1:8545"
+http_url = "http://127.0.0.1:8545"
+idle_timeout = "60s"
+multicall_address = "0x5FbDB2315678afecb367f032d93F642f64180aa3" # Multicall3 address on Anvil (Nonce 0)
+chain_id = 31337
+tx_timeout = "60s"
+tx_poll_interval = "1s"
+
+[instrument_mapping."anvil"."ETH"]
+base = "eth"
+quote = "usd"
+marketType = "spot"
+
+[token_mapping."anvil"]
+"ETH" = "eth"

@@ -1,0 +1,15 @@
+services:
+  wasm-builder:
+    build: .
+    platform: linux/amd64
+    ports:
+      - "3001:3001"
+    environment:
+      WASM_BUILDER_DEPS_DIR: /deps
+      WASM_BUILDER_TARGET_DIR: /cache/target
+      WASM_BUILDER_ADDR: 0.0.0.0:3001
+      RUST_LOG: wasm_builder=info
+    volumes:
+      - wasm-cache:/cache
+volumes:
+  wasm-cache:

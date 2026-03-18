@@ -1,0 +1,45 @@
+[package]
+name = "rengine-core"
+description = "core"
+
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+rengine-config.workspace = true
+rengine-types.workspace = true
+rengine-metrics.workspace = true
+rengine-non-wasm-types.workspace = true
+rengine-db.workspace = true
+rengine-interfaces = { workspace = true, features = ["test_utils"] }
+wasm-runtime.workspace = true
+hyperliquid.workspace = true
+binance-perp.workspace = true
+binance-spot.workspace = true
+evm.workspace = true
+evm-types.workspace = true
+
+anyhow.workspace = true
+alloy.workspace = true
+chrono.workspace = true
+hex.workspace = true
+futures.workspace = true
+futures-util.workspace = true
+rust_decimal.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true }
+tokio-stream = { workspace = true }
+tracing.workspace = true
+parking_lot.workspace = true
+url.workspace = true
+
+[dev-dependencies]
+base64.workspace = true
+rust_decimal_macros.workspace = true
+mockall.workspace = true

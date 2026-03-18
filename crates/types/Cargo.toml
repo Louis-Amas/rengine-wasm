@@ -1,0 +1,29 @@
+[package]
+name = "rengine-types"
+description = "types"
+
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow.workspace = true
+chrono.workspace = true
+borsh.workspace = true
+rust_decimal.workspace = true
+rust_decimal_macros.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+smol_str = { workspace = true, features = ["borsh"] }
+hex = { workspace = true }
+clickhouse = { workspace = true, optional = true, features = ["chrono"] }
+
+[dev-dependencies]
+toml.workspace = true
+
+[features]
+clickhouse = ["dep:clickhouse"]

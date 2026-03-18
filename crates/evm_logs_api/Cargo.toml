@@ -1,0 +1,15 @@
+[package]
+name = "evm-logs-api"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+
+[dependencies]
+wit-bindgen.workspace = true
+borsh.workspace = true
+evm-types.workspace = true
+rengine-types.workspace = true
+anyhow.workspace = true
+serde_json = { workspace = true }
+alloy = { workspace = true, default-features = false, features = ["rpc-types"] }

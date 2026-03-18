@@ -1,0 +1,16 @@
+[package]
+name = "market_features_types"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+rengine-types.workspace = true
+rengine-macros.workspace = true
+strategy-api.workspace = true
+
+borsh.workspace = true
+rust_decimal.workspace = true
+rust_decimal_macros.workspace = true

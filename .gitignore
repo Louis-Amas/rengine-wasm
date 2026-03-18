@@ -1,0 +1,8 @@
+/target
+services/wasm-builder/target/
+config/config.toml
+/db
+strategies-wasm/
+transformers-wasm/
+evm_multicalls_wasm/
+evm_logs_wasm/
