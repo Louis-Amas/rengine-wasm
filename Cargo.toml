@@ -147,7 +147,7 @@ chrono = { version = "0.4.38", features = ["serde"] }
 clickhouse = "0.14.0"
 const-hex = "1.14.1"
 once_cell = "1.21.3"
-duckdb = "1.3.2"
+duckdb = { version = "1.3.2", features = ["bundled"] }
 futures = "0.3.31"
 futures-util = "0.3.30"
 frunk = "0.4.4"

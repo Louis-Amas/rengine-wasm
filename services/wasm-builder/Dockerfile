@@ -20,12 +20,6 @@ RUN apt-get update && apt-get install -y \
     build-essential pkg-config libssl-dev curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install cargo-component (arch-aware)
-RUN ARCH=$(uname -m) && \
-    curl -LsSf "https://github.com/bytecodealliance/cargo-component/releases/latest/download/cargo-component-${ARCH}-unknown-linux-gnu.tar.gz" \
-    | tar xzf - -C /usr/local/bin/ 2>/dev/null || \
-    cargo install cargo-component
-
 # Install wasmtime CLI (pinned to match wasm-runtime crate, arch-aware)
 ENV WASMTIME_VERSION=v39.0.1
 RUN ARCH=$(uname -m) && \
@@ -47,7 +41,7 @@ COPY crates/evm_types/ /deps/evm-types/
 # evm-logs-api
 COPY crates/evm_logs_api/ /deps/evm-logs-api/
 
-# WIT files (needed by cargo-component)
+# WIT files (needed by wit-bindgen for component generation)
 COPY crates/strategy_api/strategy.wit /deps/strategy-api/strategy.wit
 COPY crates/evm_multicall_api/multicall.wit /deps/evm-multicall-api/multicall.wit
 COPY crates/evm_logs_api/evm_logs.wit /deps/evm-logs-api/evm_logs.wit
@@ -189,20 +183,14 @@ RUN apt-get update && apt-get install -y \
     build-essential pkg-config libssl-dev curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install cargo-component (arch-aware)
-RUN ARCH=$(uname -m) && \
-    (curl -LsSf "https://github.com/bytecodealliance/cargo-component/releases/latest/download/cargo-component-${ARCH}-unknown-linux-gnu.tar.gz" \
-    | tar xzf - -C /usr/local/bin/ 2>/dev/null || \
-    cargo install cargo-component)
-
 # Install wasmtime CLI (pinned to match wasm-runtime crate, arch-aware)
 ENV WASMTIME_VERSION=v39.0.1
 RUN ARCH=$(uname -m) && \
     curl -LsSf "https://github.com/bytecodealliance/wasmtime/releases/download/${WASMTIME_VERSION}/wasmtime-${WASMTIME_VERSION}-${ARCH}-linux.tar.xz" \
     | tar xJf - --strip-components=1 -C /usr/local/bin/ "wasmtime-${WASMTIME_VERSION}-${ARCH}-linux/wasmtime"
 
-# Add wasm32-wasip1 target
-RUN rustup target add wasm32-wasip1
+# Add wasm32-wasip2 target
+RUN rustup target add wasm32-wasip2
 
 # Copy API crates (deps for user builds)
 COPY --from=deps-prep /deps /deps

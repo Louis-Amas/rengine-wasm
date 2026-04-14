@@ -40,7 +40,7 @@ pub async fn run_command(child: tokio::process::Child, cancel: &CancellationToke
     }
 }
 
-/// Execute a full build: generate Cargo.toml, write files, cargo component build, wasmtime compile.
+/// Execute a full build: generate Cargo.toml, write files, cargo build --target wasm32-wasip2, wasmtime compile.
 ///
 /// Uses a shared `target_dir` so dependency artifacts are cached across builds.
 /// Only the user's crate (a single `lib.rs`) gets recompiled each time.
@@ -110,12 +110,13 @@ pub async fn execute_build(deps_dir: &str, target_dir: &str, req: &BuildRequest,
         }
     }
 
-    // 3. Run cargo component build
-    info!(name = %req.name, "starting cargo component build");
+    // 3. Run cargo build targeting wasm32-wasip2
+    info!(name = %req.name, "starting cargo build --target wasm32-wasip2");
     let child = spawn_killable(
         Command::new("cargo")
-            .arg("component")
             .arg("build")
+            .arg("--target")
+            .arg("wasm32-wasip2")
             .arg("--release")
             .current_dir(project_dir)
             .env("CARGO_TARGET_DIR", target_dir),
@@ -127,7 +128,7 @@ pub async fn execute_build(deps_dir: &str, target_dir: &str, req: &BuildRequest,
             return BuildResult {
                 success: false,
                 wasm_bytes: None,
-                build_log: format!("{log}cargo component build failed to spawn: {e}"),
+                build_log: format!("{log}cargo build failed to spawn: {e}"),
             };
         }
     };
@@ -138,15 +139,15 @@ pub async fn execute_build(deps_dir: &str, target_dir: &str, req: &BuildRequest,
             return BuildResult {
                 success: false,
                 wasm_bytes: None,
-                build_log: format!("{log}cargo component build interrupted: {e}"),
+                build_log: format!("{log}cargo build interrupted: {e}"),
             };
         }
     };
 
     let stdout = String::from_utf8_lossy(&cargo_output.stdout);
     let stderr = String::from_utf8_lossy(&cargo_output.stderr);
-    log.push_str(&format!("cargo component build stdout:\n{stdout}\n"));
-    log.push_str(&format!("cargo component build stderr:\n{stderr}\n"));
+    log.push_str(&format!("cargo build stdout:\n{stdout}\n"));
+    log.push_str(&format!("cargo build stderr:\n{stderr}\n"));
 
     if !cargo_output.status.success() {
         return BuildResult {
@@ -160,14 +161,14 @@ pub async fn execute_build(deps_dir: &str, target_dir: &str, req: &BuildRequest,
     let wasm_name = req.name.replace('-', "_");
     let target = std::path::Path::new(target_dir);
     let wasm_path = target
-        .join("wasm32-wasip1")
+        .join("wasm32-wasip2")
         .join("release")
         .join(format!("{wasm_name}.wasm"));
 
     if !wasm_path.exists() {
         // Try debug path as fallback
         let debug_path = target
-            .join("wasm32-wasip1")
+            .join("wasm32-wasip2")
             .join("debug")
             .join(format!("{wasm_name}.wasm"));
 

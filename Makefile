@@ -22,7 +22,7 @@ TRANSFORMER_DIRS := $(wildcard transformers/*)
 MULTICALL_DIRS := $(wildcard evm_multicalls/*)
 LOGS_DIRS := $(wildcard evm_logs/*)
 
-TARGET_WASM_DIR := target/wasm32-wasip1/debug
+TARGET_WASM_DIR := target/wasm32-wasip2/debug
 WASM_OUT_DIR := strategies-wasm/
 TRANSFORMER_WASM_OUT_DIR := transformers-wasm/
 MULTICALL_WASM_OUT_DIR := evm_multicalls_wasm/
@@ -37,7 +37,7 @@ test: compile
 	cargo test
 
 # =========================================================
-# === Build phase (cargo component build)
+# === Build phase (cargo build --target wasm32-wasip2)
 # =========================================================
 
 build: build-strategies build-transformers build-multicalls build-logs
@@ -47,7 +47,7 @@ build-strategies:
 	@for dir in $(STRATEGY_DIRS); do \
 		if [ -f $$dir/Cargo.toml ]; then \
 			echo "  -> Building $$dir"; \
-			cargo component build --manifest-path $$dir/Cargo.toml; \
+			cargo build --target wasm32-wasip2 --manifest-path $$dir/Cargo.toml; \
 		fi; \
 	done
 
@@ -56,7 +56,7 @@ build-transformers:
 	@for dir in $(TRANSFORMER_DIRS); do \
 		if [ -f $$dir/Cargo.toml ]; then \
 			echo "  -> Building $$dir"; \
-			cargo component build --manifest-path $$dir/Cargo.toml; \
+			cargo build --target wasm32-wasip2 --manifest-path $$dir/Cargo.toml; \
 		fi; \
 	done
 
@@ -65,7 +65,7 @@ build-multicalls:
 	@for dir in $(MULTICALL_DIRS); do \
 		if [ -f $$dir/Cargo.toml ]; then \
 			echo "  -> Building $$dir"; \
-			cargo component build --manifest-path $$dir/Cargo.toml; \
+			cargo build --target wasm32-wasip2 --manifest-path $$dir/Cargo.toml; \
 		fi; \
 	done
 
@@ -74,7 +74,7 @@ build-logs:
 	@for dir in $(LOGS_DIRS); do \
 		if [ -f $$dir/Cargo.toml ]; then \
 			echo "  -> Building $$dir"; \
-			cargo component build --manifest-path $$dir/Cargo.toml; \
+			cargo build --target wasm32-wasip2 --manifest-path $$dir/Cargo.toml; \
 		fi; \
 	done
 

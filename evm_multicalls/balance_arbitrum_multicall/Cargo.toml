@@ -6,11 +6,6 @@ edition = "2021"
 [lib]
 crate-type = ["cdylib"]
 
-[package.metadata.component]
-package = "multicall:multicall"
-
-[package.metadata.component.dependencies]
-
 [dependencies]
 rengine-types.workspace = true
 evm-multicall-api.workspace = true

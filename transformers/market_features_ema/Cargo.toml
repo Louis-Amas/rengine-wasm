@@ -6,11 +6,6 @@ edition = "2021"
 [lib]
 crate-type = ["cdylib"]
 
-[package.metadata.component]
-package = "strategy:strategy"
-
-[package.metadata.component.dependencies]
-
 [dependencies]
 market_features_types = { path = "../market_features_types" }
 rengine-types.workspace = true

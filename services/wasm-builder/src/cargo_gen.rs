@@ -10,11 +10,10 @@ const ALLOWED_DEPS: &[&str] = &[
     "alloy",
 ];
 
-/// Component types and their corresponding API crate + WIT package metadata.
+/// Component types and their corresponding API crate.
 #[derive(Debug, Clone, Copy)]
 pub struct ComponentMeta {
     pub api_crate: &'static str,
-    pub wit_package: &'static str,
     /// Extra required deps beyond the API crate (e.g. evm-types for multicall/evm_logs).
     pub extra_deps: &'static [&'static str],
 }
@@ -23,17 +22,14 @@ pub fn component_meta(component_type: &str) -> Option<ComponentMeta> {
     match component_type {
         "transformer" | "strategy" => Some(ComponentMeta {
             api_crate: "strategy-api",
-            wit_package: "strategy:strategy",
             extra_deps: &[],
         }),
         "multicall" => Some(ComponentMeta {
             api_crate: "evm-multicall-api",
-            wit_package: "multicall:multicall",
             extra_deps: &["evm-types"],
         }),
         "evm_logs" => Some(ComponentMeta {
             api_crate: "evm-logs-api",
-            wit_package: "evm-logs:evm-logs",
             extra_deps: &["evm-types"],
         }),
         _ => None,
@@ -101,18 +97,6 @@ edition = "2021"
 crate-type = ["cdylib"]
 "#
     ));
-
-    // [package.metadata.component] — only for strategy/transformer/multicall (not evm_logs)
-    if component_type != "evm_logs" {
-        toml_parts.push(format!(
-            r#"[package.metadata.component]
-package = "{}"
-
-[package.metadata.component.dependencies]
-"#,
-            meta.wit_package
-        ));
-    }
 
     // [dependencies]
     let mut deps_section = String::from("[dependencies]\n");
@@ -203,7 +187,7 @@ mod tests {
         let toml = generate_cargo_toml("/deps", "my_ema", "transformer", &[]).unwrap();
         assert!(toml.contains("strategy-api"));
         assert!(toml.contains("rengine-types"));
-        assert!(toml.contains("strategy:strategy"));
+        assert!(!toml.contains("[package.metadata.component]"));
         assert!(toml.contains("borsh"));
     }
 
@@ -213,7 +197,7 @@ mod tests {
             .unwrap();
         assert!(toml.contains("evm-multicall-api"));
         assert!(toml.contains("evm-types"));
-        assert!(toml.contains("multicall:multicall"));
+        assert!(!toml.contains("[package.metadata.component]"));
         assert!(toml.contains("alloy"));
     }
 
