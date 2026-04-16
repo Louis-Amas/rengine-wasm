@@ -1,0 +1,18 @@
+[package]
+name = "momentum_regime"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+market_features_types = { path = "../market_features_types" }
+rengine-types.workspace = true
+rengine-macros.workspace = true
+strategy-api.workspace = true
+
+anyhow.workspace = true
+borsh.workspace = true
+rust_decimal.workspace = true
+rust_decimal_macros.workspace = true
