@@ -138,12 +138,13 @@ pub async fn execute_check(
         }
     }
 
-    // 3. Run cargo component check with JSON output
-    info!(name = %req.name, "starting cargo component check");
+    // 3. Run cargo check with JSON output targeting wasm32-wasip2
+    info!(name = %req.name, "starting cargo check --target wasm32-wasip2");
     let child = spawn_killable(
         Command::new("cargo")
-            .arg("component")
             .arg("check")
+            .arg("--target")
+            .arg("wasm32-wasip2")
             .arg("--message-format=json")
             .current_dir(project_dir)
             .env("CARGO_TARGET_DIR", target_dir),
@@ -155,7 +156,7 @@ pub async fn execute_check(
             return CheckResult {
                 success: false,
                 diagnostics: vec![],
-                raw_stderr: format!("cargo component check failed to spawn: {e}"),
+                raw_stderr: format!("cargo check failed to spawn: {e}"),
             };
         }
     };
@@ -166,7 +167,7 @@ pub async fn execute_check(
             return CheckResult {
                 success: false,
                 diagnostics: vec![],
-                raw_stderr: format!("cargo component check interrupted: {e}"),
+                raw_stderr: format!("cargo check interrupted: {e}"),
             };
         }
     };

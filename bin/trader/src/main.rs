@@ -2,8 +2,10 @@ use anyhow::Result;
 use rengine_api::{spawn_http_api, AppState};
 use rengine_config::Config;
 use rengine_core::Engine;
+use rengine_mcp::{spawn_mcp_server, McpState};
 use std::env;
 use tokio::{signal, sync::oneshot};
+use tokio_util::sync::CancellationToken;
 use tracing::{error, info};
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
@@ -31,8 +33,10 @@ async fn main() -> Result<()> {
     let config = Config::config_from_file(&config_path)?;
     let http_addr = format!("0.0.0.0:{}", config.http_api_port);
 
+    let mcp_port = config.mcp_port;
     let (mut engine, external_requests_tx) = Engine::new(config).await?;
 
+    let mcp_requests_tx = external_requests_tx.clone();
     let http_api_state = AppState::new(
         engine.strategies_handler.clone(),
         engine.transformers_handler.clone(),
@@ -42,6 +46,21 @@ async fn main() -> Result<()> {
     );
 
     let http_handle = spawn_http_api(http_api_state, http_addr.parse()?).await?;
+
+    let mcp_ct = CancellationToken::new();
+    let mcp_handle = if let Some(mcp_port) = mcp_port {
+        let mcp_state = McpState::new(
+            engine.strategies_handler.clone(),
+            engine.transformers_handler.clone(),
+            engine.evm_readers.clone(),
+            engine.state(),
+            mcp_requests_tx,
+        );
+        let mcp_addr = format!("0.0.0.0:{mcp_port}");
+        Some(spawn_mcp_server(mcp_state, mcp_addr.parse()?, mcp_ct.clone()).await?)
+    } else {
+        None
+    };
 
     let (shutdown_tx, shutdown_rx) = oneshot::channel();
 
@@ -78,6 +97,10 @@ async fn main() -> Result<()> {
     }
 
     http_handle.abort();
+    mcp_ct.cancel();
+    if let Some(h) = mcp_handle {
+        h.abort();
+    }
 
     info!("Application shutdown complete");
     Ok(())

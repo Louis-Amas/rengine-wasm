@@ -92,6 +92,8 @@ pub struct Config {
     pub mappings: MappingInner,
     #[serde(default = "default_http_api_port")]
     pub http_api_port: u16,
+    /// Port for the MCP server. If not set, the MCP server is not started.
+    pub mcp_port: Option<u16>,
 }
 
 const fn default_http_api_port() -> u16 {

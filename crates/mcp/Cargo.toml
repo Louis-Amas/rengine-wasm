@@ -1,27 +1,27 @@
 [package]
-name = "trader"
+name = "rengine-mcp"
+description = "MCP server for rengine trading engine"
 
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 authors.workspace = true
 
-[[bin]]
-name = "trader"
-path = "src/main.rs"
-
 [lints]
 workspace = true
 
 [dependencies]
-rengine-api.workspace = true
-rengine-config.workspace = true
-rengine-core.workspace = true
-rengine-mcp.workspace = true
 rengine-types.workspace = true
+rengine-core.workspace = true
+
+rmcp.workspace = true
 
 anyhow.workspace = true
+axum.workspace = true
+base64.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 tokio.workspace = true
 tokio-util.workspace = true
 tracing.workspace = true
-tracing-subscriber.workspace = true
+parking_lot.workspace = true

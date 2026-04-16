@@ -129,6 +129,7 @@ rengine-db = { path = "crates/db" }
 rengine-interfaces = { path = "crates/interfaces" }
 rengine-macros = { path = "crates/macros" }
 rengine-metrics = { path = "crates/metrics" }
+rengine-mcp = { path = "crates/mcp" }
 rengine-non-wasm-types = { path = "crates/non_wasm_types" }
 rengine-types = { path = "crates/types" }
 rengine-utils = { path = "crates/utils" }
@@ -190,3 +191,9 @@ tracing-subscriber = { version = "0.3.18", features = ["fmt", "env-filter"] }
 url = "2.5.2"
 uuid = { version = "1.4", features = ["v4"] }
 ed25519-dalek = { version = "2.1", features = ["pkcs8", "pem"] }
+rmcp = { version = "1", features = [
+  "server",
+  "transport-streamable-http-server",
+  "macros",
+] }
+tokio-util = "0.7"

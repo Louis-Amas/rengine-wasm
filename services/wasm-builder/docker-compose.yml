@@ -1,6 +1,8 @@
 services:
   wasm-builder:
-    build: .
+    build:
+      context: ../..
+      dockerfile: services/wasm-builder/Dockerfile
     platform: linux/amd64
     ports:
       - "3001:3001"
