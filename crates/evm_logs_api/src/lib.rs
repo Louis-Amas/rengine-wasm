@@ -3,6 +3,7 @@ pub mod bindings {
     generate!({path: "evm_logs.wit", pub_export_macro: true, export_macro_name: "export", });
 }
 
+pub use crate::bindings::{export, Guest};
 use alloy::primitives::Log;
 use evm_types::LogSubscription;
 use rengine_types::Action;

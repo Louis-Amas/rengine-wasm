@@ -63,6 +63,15 @@ fn dep_features(name: &str) -> Option<&'static [&'static str]> {
     }
 }
 
+/// Whether to disable default features for a dep (needed for WASI compatibility).
+fn dep_no_default_features(name: &str) -> bool {
+    match name {
+        // alloy default features pull in wasm-bindgen which is incompatible with wasip2
+        "alloy" => true,
+        _ => false,
+    }
+}
+
 /// Generate a Cargo.toml string for a user component.
 ///
 /// `deps_dir` is the path where API crates are available (e.g. `/deps`).
@@ -123,12 +132,19 @@ crate-type = ["cdylib"]
     // Whitelisted user-requested deps
     for dep in requested_deps {
         let version = dep_version(dep);
-        if let Some(features) = dep_features(dep) {
-            let features_str: Vec<String> = features.iter().map(|f| format!("\"{f}\"")).collect();
-            deps_section.push_str(&format!(
-                "{dep} = {{ version = \"{version}\", features = [{}] }}\n",
-                features_str.join(", ")
-            ));
+        let no_defaults = dep_no_default_features(dep);
+        let features = dep_features(dep);
+
+        if no_defaults || features.is_some() {
+            let mut parts = vec![format!("version = \"{version}\"")];
+            if no_defaults {
+                parts.push("default-features = false".to_string());
+            }
+            if let Some(feats) = features {
+                let features_str: Vec<String> = feats.iter().map(|f| format!("\"{f}\"")).collect();
+                parts.push(format!("features = [{}]", features_str.join(", ")));
+            }
+            deps_section.push_str(&format!("{dep} = {{ {} }}\n", parts.join(", ")));
         } else {
             deps_section.push_str(&format!("{dep} = \"{version}\"\n"));
         }

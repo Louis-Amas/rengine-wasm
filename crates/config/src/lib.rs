@@ -94,6 +94,8 @@ pub struct Config {
     pub http_api_port: u16,
     /// Port for the MCP server. If not set, the MCP server is not started.
     pub mcp_port: Option<u16>,
+    /// URL of the wasm-builder service (e.g. `http://localhost:3001`). If not set, build/check tools are disabled.
+    pub wasm_builder_url: Option<String>,
 }
 
 const fn default_http_api_port() -> u16 {

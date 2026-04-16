@@ -11,8 +11,8 @@ set -euo pipefail
 #   ./transformers.sh execute ./dummy.cwasm
 #   ./transformers.sh toggle ema_price false
 
-API_BASE="http://10.0.0.2:3000/transformers"
-# API_BASE="http://localhost:3000/transformers"
+# API_BASE="http://10.0.0.2:3000/transformers"
+API_BASE="http://localhost:3000/transformers"
 
 if [ $# -lt 1 ]; then
   echo "Usage:"
@@ -41,7 +41,8 @@ add)
 
   echo "Adding transformer '$TRANSFORMER_ID'..."
   RESPONSE=$(
-    base64 -w0 "$WASM_FILE" |
+    base64 -i "$WASM_FILE" |
+      tr -d '\n' |
       jq -Rs '{ wasm: . }' |
       curl -s -X POST "$API_BASE/$TRANSFORMER_ID" \
         -H "Content-Type: application/json" \
@@ -63,7 +64,8 @@ execute)
 
   echo "Executing transformer..."
   RESPONSE=$(
-    base64 -w0 "$WASM_FILE" |
+    base64 -i "$WASM_FILE" |
+      tr -d '\n' |
       jq -Rs '{ wasm: . }' |
       curl -s -X POST "$API_BASE/execute" \
         -H "Content-Type: application/json" \

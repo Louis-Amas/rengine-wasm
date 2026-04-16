@@ -20,15 +20,18 @@ pub struct McpState {
     pub(crate) evm_readers: EvmReaders,
     pub(crate) state: Arc<RwLock<State>>,
     pub(crate) external_requests_tx: UnboundedSender<ExecutionRequest>,
+    pub(crate) wasm_builder_url: Option<String>,
+    pub(crate) http_client: reqwest::Client,
 }
 
 impl McpState {
-    pub const fn new(
+    pub fn new(
         strategies_handler: StrategiesHandler,
         transformers_handler: TransformersHandler,
         evm_readers: EvmReaders,
         state: Arc<RwLock<State>>,
         external_requests_tx: UnboundedSender<ExecutionRequest>,
+        wasm_builder_url: Option<String>,
     ) -> Self {
         Self {
             strategies_handler,
@@ -36,6 +39,8 @@ impl McpState {
             evm_readers,
             state,
             external_requests_tx,
+            wasm_builder_url,
+            http_client: reqwest::Client::new(),
         }
     }
 }

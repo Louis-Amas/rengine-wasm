@@ -41,7 +41,8 @@ add)
 
   echo "Adding strategy '$STRATEGY_ID'..."
   RESPONSE=$(
-    base64 -w0 "$WASM_FILE" |
+    base64 -i "$WASM_FILE" |
+      tr -d '\n' |
       jq -Rs '{ wasm: . }' |
       curl -s -X POST "$API_BASE/$STRATEGY_ID" \
         -H "Content-Type: application/json" \
@@ -63,7 +64,8 @@ execute)
 
   echo "Executing strategy..."
   RESPONSE=$(
-    base64 -w0 "$WASM_FILE" |
+    base64 -i "$WASM_FILE" |
+      tr -d '\n' |
       jq -Rs '{ wasm: . }' |
       curl -s -X POST "$API_BASE/execute" \
         -H "Content-Type: application/json" \

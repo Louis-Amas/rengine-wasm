@@ -34,6 +34,7 @@ async fn main() -> Result<()> {
     let http_addr = format!("0.0.0.0:{}", config.http_api_port);
 
     let mcp_port = config.mcp_port;
+    let wasm_builder_url = config.wasm_builder_url.clone();
     let (mut engine, external_requests_tx) = Engine::new(config).await?;
 
     let mcp_requests_tx = external_requests_tx.clone();
@@ -55,6 +56,7 @@ async fn main() -> Result<()> {
             engine.evm_readers.clone(),
             engine.state(),
             mcp_requests_tx,
+            wasm_builder_url.clone(),
         );
         let mcp_addr = format!("0.0.0.0:{mcp_port}");
         Some(spawn_mcp_server(mcp_state, mcp_addr.parse()?, mcp_ct.clone()).await?)

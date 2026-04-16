@@ -1702,6 +1702,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2af50177e190e07a26ab74f8b1efbfe2ef87da2116221318cb1c2e82baf7de06"
 
 [[package]]
+name = "basis_features"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "borsh",
+ "rengine-macros",
+ "rengine-types",
+ "rust_decimal",
+ "rust_decimal_macros",
+ "strategy-api",
+]
+
+[[package]]
 name = "binance-perp"
 version = "0.0.1"
 dependencies = [
@@ -3311,6 +3324,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "flow_toxicity"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "borsh",
+ "market_features_types",
+ "rengine-macros",
+ "rengine-types",
+ "rust_decimal",
+ "rust_decimal_macros",
+ "strategy-api",
+]
+
+[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4788,6 +4815,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "momentum_regime"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "borsh",
+ "market_features_types",
+ "rengine-macros",
+ "rengine-types",
+ "rust_decimal",
+ "rust_decimal_macros",
+ "strategy-api",
+]
+
+[[package]]
 name = "native-tls"
 version = "0.2.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6066,6 +6107,7 @@ dependencies = [
  "parking_lot",
  "rengine-core",
  "rengine-types",
+ "reqwest",
  "rmcp",
  "serde",
  "serde_json",

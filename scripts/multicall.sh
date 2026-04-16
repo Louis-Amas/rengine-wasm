@@ -40,7 +40,8 @@ add)
 
   echo "Adding multicall '$ID' for venue '$VENUE'..."
   RESPONSE=$(
-    base64 -w0 "$WASM_FILE" |
+    base64 -i "$WASM_FILE" |
+      tr -d '\n' |
       jq -Rs '{ wasm: . }' |
       curl -s -X POST "$API_BASE/$VENUE/multicall/$ID" \
         -H "Content-Type: application/json" \

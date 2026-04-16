@@ -6,7 +6,7 @@ use rengine_types::{
 };
 use rmcp::{handler::server::wrapper::Parameters, schemars, tool, tool_router};
 use serde::Deserialize;
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -116,6 +116,32 @@ struct EvmIdParams {
     venue: String,
     /// Reader / processor identifier
     id: String,
+}
+
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
+struct BuildComponentParams {
+    /// Component type: "strategy", "transformer", "multicall", or `evm_logs`
+    component_type: String,
+    /// Component name (used as the crate name)
+    name: String,
+    /// Source files as a map of path to content (e.g. `{"src/lib.rs": "use strategy_api::*; ..."}`)
+    files: HashMap<String, String>,
+    /// Optional whitelisted dependencies to include (e.g. `["serde_json", "alloy"]`)
+    #[serde(default)]
+    dependencies: Vec<String>,
+}
+
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
+struct CheckComponentParams {
+    /// Component type: "strategy", "transformer", "multicall", or `evm_logs`
+    component_type: String,
+    /// Component name
+    name: String,
+    /// Source files as a map of path to content
+    files: HashMap<String, String>,
+    /// Optional whitelisted dependencies
+    #[serde(default)]
+    dependencies: Vec<String>,
 }
 
 // ---------------------------------------------------------------------------
@@ -549,5 +575,75 @@ impl McpState {
             .map_err(|e| e.to_string())?;
 
         Ok(json_text(serde_json::json!({ "status": "ok" })))
+    }
+
+    // =======================================================================
+    // WASM Builder Tools
+    // =======================================================================
+
+    #[tool(
+        description = "Compile a WASM component from Rust source code. Returns base64-encoded WASM binary on success, or build logs on failure. Supported component types: strategy, transformer, multicall, evm_logs. Allowed dependencies: borsh, rust_decimal, rust_decimal_macros, serde, serde_json, anyhow, smol_str, alloy."
+    )]
+    async fn build_component(
+        &self,
+        Parameters(params): Parameters<BuildComponentParams>,
+    ) -> Result<String, String> {
+        let url = self
+            .wasm_builder_url
+            .as_ref()
+            .ok_or("wasm_builder_url is not configured")?;
+
+        let resp = self
+            .http_client
+            .post(format!("{url}/build"))
+            .json(&serde_json::json!({
+                "component_type": params.component_type,
+                "name": params.name,
+                "files": params.files,
+                "dependencies": params.dependencies,
+            }))
+            .send()
+            .await
+            .map_err(|e| format!("request to wasm-builder failed: {e}"))?;
+
+        let body: serde_json::Value = resp
+            .json()
+            .await
+            .map_err(|e| format!("failed to parse wasm-builder response: {e}"))?;
+
+        Ok(json_text(body))
+    }
+
+    #[tool(
+        description = "Check (type-check) a WASM component without full compilation. Returns structured diagnostics with file, line, column, severity, and error codes. Useful for fast feedback on code correctness."
+    )]
+    async fn check_component(
+        &self,
+        Parameters(params): Parameters<CheckComponentParams>,
+    ) -> Result<String, String> {
+        let url = self
+            .wasm_builder_url
+            .as_ref()
+            .ok_or("wasm_builder_url is not configured")?;
+
+        let resp = self
+            .http_client
+            .post(format!("{url}/check"))
+            .json(&serde_json::json!({
+                "component_type": params.component_type,
+                "name": params.name,
+                "files": params.files,
+                "dependencies": params.dependencies,
+            }))
+            .send()
+            .await
+            .map_err(|e| format!("request to wasm-builder failed: {e}"))?;
+
+        let body: serde_json::Value = resp
+            .json()
+            .await
+            .map_err(|e| format!("failed to parse wasm-builder response: {e}"))?;
+
+        Ok(json_text(body))
     }
 }
