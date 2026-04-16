@@ -1,3 +1,35 @@
+//! **Market Features EMA Transformer** — exponential smoothing of tick-level microstructure.
+//!
+//! Triggered on a 60-second [`Timer`](rengine_types::StateUpdateKey::Timer). On each tick
+//! it reads the cumulative [`MarketState`] indicators produced by `market_features` via
+//! [`FromIndicators`](rengine_macros::FromIndicators), computes deltas (change since last
+//! tick), and updates exponential moving averages (α = 0.01).
+//!
+//! **Inputs**: `mf_{market_id}_{field}` indicators (via `MarketState::from_indicators_with_market`).
+//!
+//! **Outputs**: `mf_{market_id}_{field}` indicators for delta, EMA, and derived ratio fields
+//! defined in [`MarketEmaState`].
+//!
+//! ## Delta-based EMA pattern
+//!
+//! Since [`MarketState`] fields are cumulative, the EMA is computed on the *delta*:
+//! ```text
+//! delta = current_value - last_value
+//! ema += α × (delta - ema)
+//! last_value = current_value
+//! ```
+//! Some fields (e.g., `trade_flow`, `liquidity_imp`) are instantaneous rather than
+//! cumulative — these are smoothed directly without delta computation.
+//!
+//! ## Derived ratios
+//!
+//! After updating all EMAs, the transformer computes composite signals:
+//! - **liquidity_real_ema**: volume_ema / variance_ema
+//! - **momentum_ema**: variance2_ema / variance_ema (return clustering)
+//! - **power_ema**: slippage/variation ratio, bounded
+//! - **q_pnl_ema**: synthetic PnL from volume, liquidity, skew, and power
+//! - **smile_ema**: directional variance asymmetry
+
 use anyhow::Result;
 use market_features_types::{get_market_id, EmaState, MarketEmaState, MarketState, INSTRUMENTS};
 use rengine_types::{ExecutionRequest, StateUpdateKey, StrategyConfiguration};
@@ -45,6 +77,15 @@ impl UnsafePlugin for EmaVolume {
     }
 }
 
+/// Updates all EMA fields for a single instrument.
+///
+/// 1. Computes deltas between the current [`MarketState`] snapshot and the stored `*_last` values.
+/// 2. Updates each `*_ema` field: `ema += α × (delta - ema)` with α = 0.01.
+/// 3. Computes derived ratios (liquidity, momentum, power, q-learning PnL, smile).
+/// 4. Stores current values as `*_last` for the next tick.
+///
+/// Variance-related EMAs are initialized to small positive values (1e-10) to prevent
+/// division by zero in ratio calculations on the first ticks.
 fn process_ema(state: &mut MarketEmaState, mf: &MarketState) {
     // Calculate EMAs with alpha = 0.01 (matching Python ema parameter)
     let alpha = dec!(0.01);

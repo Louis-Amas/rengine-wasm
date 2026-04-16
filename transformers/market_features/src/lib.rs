@@ -1,3 +1,27 @@
+//! **Market Features Transformer** — tick-level microstructure feature extraction.
+//!
+//! Triggered on [`SetTradeFlow`](rengine_types::StateUpdateKey::SetTradeFlow) for each
+//! active instrument. On every invocation it processes the latest batch of public trades
+//! and updates the top-of-book snapshot.
+//!
+//! **Inputs**: `get_trade_flow()` (all recent trades), `get_book(instrument)` (best bid/ask).
+//!
+//! **Outputs**: `mf_{market_id}_{field}` indicators via [`ToIndicators`](rengine_macros::ToIndicators).
+//!
+//! ## Micro-cluster model
+//!
+//! Trades sharing the same millisecond timestamp are grouped into a "micro-cluster" —
+//! these represent a single taker order that matched multiple resting orders. The cluster
+//! is finalized when a trade with a new timestamp arrives. Per-cluster statistics (slippage,
+//! geometric mean, directional flow) are more meaningful than per-trade statistics because
+//! they correspond to single execution decisions.
+//!
+//! ## Parabolic market model
+//!
+//! The transformer tracks three micro-price estimators (hot/warm/cold) using a parabolic
+//! market model with parameter α = 2. These model different mean-reversion timescales
+//! and produce PnL and mean-reversion signals at each scale.
+
 use anyhow::Result;
 use market_features_types::{get_market_id, MarketState, State, INSTRUMENTS};
 use rengine_types::{ExecutionRequest, Side, StateUpdateKey, StrategyConfiguration, VenueBookKey};
@@ -8,8 +32,11 @@ use strategy_api::{export, get_book, get_trade_flow, impl_guest_from_unsafe_plug
 
 struct MarketFeatures;
 
-const CONTRACT_SIZE: Decimal = dec!(1); // For spot markets
-const ALPHA: Decimal = dec!(2); // Parabolic market parameter
+/// Contract size multiplier. Set to 1 for spot and standard perp markets.
+const CONTRACT_SIZE: Decimal = dec!(1);
+/// Parabolic market model parameter (α). Controls the decay rate of micro-price estimators.
+/// β = α/(1+α) ≈ 0.667 is the corresponding EMA weight.
+const ALPHA: Decimal = dec!(2);
 
 impl UnsafePlugin for MarketFeatures {
     type State = State;
@@ -57,6 +84,21 @@ impl UnsafePlugin for MarketFeatures {
     }
 }
 
+/// Processes a batch of public trades for a single instrument.
+///
+/// Trades are grouped into micro-clusters by timestamp. Within each cluster the function
+/// accumulates size, volume, and log returns. When a new timestamp is encountered the
+/// previous cluster is finalized:
+///
+/// 1. **Slippage**: size-weighted geometric mean of within-cluster log returns.
+/// 2. **Adverse selection** (`antiselek`): volume × (|total_log| - |geom_ratio|).
+/// 3. **Micro-price updates**: three exponential estimators (hot/warm/cold) using the
+///    parabolic model parameter α = 2.
+/// 4. **Mean reversion**: cross-product of micro-price level and cluster log return.
+/// 5. **PnL**: simulated market-making PnL at each timescale.
+/// 6. **Higher moments**: variation (|log|), variance (log²), skew (|log³|).
+/// 7. **Directional flow**: size/volume/variance split by taker side.
+/// 8. **Retail detection**: trades with zero log return (price unchanged).
 fn process_trade_flow(
     state: &mut MarketState,
     trades: &[rengine_types::PublicTrade],
@@ -214,6 +256,14 @@ fn process_trade_flow(
     Ok(())
 }
 
+/// Updates order-book-derived features from the current best bid/ask.
+///
+/// Computed features:
+/// - **spread**: `ln(best_ask / best_bid)` — tighter is more liquid.
+/// - **liquidity_imp**: `(bid_notional + ask_notional) / (2 × spread²)` — depth relative to spread.
+/// - **liquidity_imbalance**: `bid_notional - ask_notional` — positive means heavier bid.
+/// - **liquidity_real**: `volume / variance` — variance-normalized cumulative liquidity.
+/// - **liq_up / liq_dw**: directional liquidity as `flow / variance` per side.
 fn process_top_of_book(
     state: &mut MarketState,
     book: &rengine_types::TopBookUpdate,
